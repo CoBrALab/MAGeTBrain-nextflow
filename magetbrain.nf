@@ -2,7 +2,6 @@ params.primarySpectra = 'T1w'
 params.inputDir = 'inputs'
 params.outputDir = 'output'
 params.fast = ''
-
 process registerAffine {
   label 'registerAffine'
   cpus 8
@@ -170,6 +169,34 @@ process majorityVote {
   """
 }
 
+process collectVolumes {
+  label 'collectVolumes'
+  cpus 4
+  // memory '16GB'
+  // time '30min'
+
+  publishDir "${params.outputDir}/labels/majorityvote/collectVolumes" 
+
+  input:
+    path labelCsv
+    path input
+
+  output:
+    path "collected_volumes.tsv"
+
+  script:
+    def labelCsvArg = labelCsv.name != 'NO_FILE' ? "${labelCsv}" : ""
+    """
+    collect_volumes_nifti.sh ${labelCsvArg} ${input}
+    """
+
+  stub:
+    def labelCsvArg = labelCsv.name != 'NO_FILE' ? "${labelCsv}" : ""
+    """
+    echo collect_volumes_nifti.sh ${labelCsvArg} ${input}
+    """
+}
+
 workflow resampleCanditateLabels {
   take:
     atlasTemplateTransforms
@@ -240,8 +267,12 @@ workflow MAGeTBrain {
     // Use transforms to resample all candidate labels to subject space
     resampleCanditateLabels(registerAtlasesTemplates.out.transforms, registerTemplatesSubjects.out.transforms, subjects, labels)
     | groupTuple(by: [0, 1]) | majorityVote
-}
 
+    emit: 
+        majorityVoteOutput = majorityVote.out
+
+    
+}
 workflow {
   // Read in atlas files, use primarySpectra option to determine which will be the primary match
   // map the filename to a subject ID for later use
@@ -260,5 +291,15 @@ workflow {
   def subjects = Channel.fromPath( 'inputs/subjects/*_' + params.primarySpectra + '.nii.gz' )
                       .map { file -> tuple(file.simpleName.minus('_' + params.primarySpectra), file) }
 
-  MAGeTBrain(atlases, labels, templates, subjects)
+  // Optional labels.csv for collect_volumes_nifti.sh
+  def labelsCSV = file("${params.inputDir}/VolumeLabels.csv").exists() ? 
+                  file("${params.inputDir}/VolumeLabels.csv") : 
+                  file("NO_FILE")
+
+  // Run MAGeTBrain 
+  def majorityVoteOutput = MAGeTBrain(atlases, labels, templates, subjects)
+    
+  // Run volume collection
+  collectVolumes(labelsCSV, majorityVoteOutput.flatten().collect() )
 }
+
