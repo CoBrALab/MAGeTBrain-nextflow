@@ -1,0 +1,67 @@
+# MAGeTbrain Pipeline
+
+A Nextflow implementation of the [Multiple Automatically Generated Templates (MAGeT) brain](https://github.com/CobraLab/MAGeTbrain) segmentation pipeline.
+
+> Pipitone J, Park MT, Winterburn J, et al. Multi-atlas segmentation of the whole hippocampus
+> and subfields using multiple automatically generated templates. Neuroimage. 2014;
+
+> M Mallar Chakravarty, Patrick Steadman, Matthijs C van Eede, Rebecca D Calcott, Victoria Gu, Philip Shaw, Armin Raznahan, D Louis Collins, and Jason P Lerch.
+> Performing label-fusion-based segmentation using multiple automatically generated templates. Hum Brain Mapp, 34(10):2635–54, October 2013. (doi:10.1002/hbm.22092)
+
+## Prerequisites
+
+- [Nextflow](https://www.nextflow.io/) (version 20.07.1 or later)
+- [Docker](https://www.docker.com/) or [Singularity](https://sylabs.io/singularity/)
+- [ANTs](https://github.com/ANTsX/ANTs)
+
+## Quick Start
+
+> [!IMPORTANT]  
+> All images should be in NIfTI format (`.nii.gz`)  
+> `.mnc` can be converted to NIfTI using `mnc2nii` from minc-toolkit-v2  
+> [link to docs](https://bic-mni.github.io/man-pages/man/mnc2nii)
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/CoBrALab/MAGeTBrain-nextflow.git
+cd MAGeTBrain-nextflow
+```
+
+2. Input structure
+   Atlases, templates and subjects need to be in a specific structure in the `inputs` directory.
+   Labels for each atlas `<atlasname>_label_<labelname1>.nii.gz` should be included in the `atlases` directory.
+   These optional labels are for collecting the volumes of the majority votes.
+   Atlases, templates, subjects and labels should be structured in an input directory as follows:
+
+> [!IMPORTANT]  
+> A note about labels for use with `collect_volumes_nifti_sh`
+> Nextflow uses regex to match `volume_label_<label>.csv` to the corresponding majorityVote ouput
+> Specifically it matches on `\w`, that is any letter, digit or underscore. Equivalent to [a-zA-Z0-9_].
+> /_label_([\w]+)\.nii.gz/
+> \_This means only alphanumerical characters can be used\_
+> other characters like `-  , . < >` etc will cause errors
+
+```bash
+inputs
+├── atlases
+│   ├── atlas1_label_<labelname1>.nii.gz
+│   ├── atlas1_label_<labelname2>.nii.gz
+│   ├── atlas1_T1w.nii.gz
+│   ├── volume_labels_<labelname1>.csv
+│   ├── volume_labels_<labelname2>.csv
+│   └── ...
+├── subjects
+│   ├── subject1_T1w.nii.gz
+│   ├── subject2_T1w.nii.gz
+│   ├── subject3_T1w.nii.gz
+│   ├── subject4_T1w.nii.gz
+│   ├── subject5_T1w.nii.gz
+│   └── ...
+└── templates
+    ├── subject2_T1w.nii.gz
+    ├── subject5_T1w.nii.gz
+    └── ...
+```
+
+3. When the `inputs` directory has been set-up as above the workflow can be run with the following command `nextflow magetbrain.nf`

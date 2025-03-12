@@ -2,7 +2,6 @@ params.primarySpectra = 'T1w'
 params.inputDir = 'inputs'
 params.outputDir = 'output'
 params.fast = ''
-
 process registerAffine {
   label 'registerAffine'
   cpus 8
@@ -147,7 +146,7 @@ process majorityVote {
   // memory '16GB'
   // time '30min'
 
-  publishDir 'output/labels/majorityvote'
+  publishDir 'output/labels/majorityvote', mode: "rellink"
 
   input:
     tuple val(subjectId),
@@ -168,6 +167,55 @@ process majorityVote {
   echo ImageMath 3 ${subjectId}${labelExt}.nii.gz MajorityVoting candidate?.nii.gz
   touch ${subjectId}${labelExt}.nii.gz
   """
+}
+
+process collectVolumes {
+  label 'collectVolumes'
+  cpus 4
+  // memory '16GB'
+  // time '30min'
+
+
+  input:
+    tuple path(labelCsv), path(input)  
+
+  output:
+    path "${input.baseName}_volume_output.tsv"
+
+  script:
+    
+    def labelCsvArg = labelCsv.name != 'NO_FILE' ? "${labelCsv}" : ""
+    """
+    collect_volumes_nifti.sh ${labelCsvArg} ${input} > ${input.baseName}_volume_output.tsv
+    """
+
+  stub:
+    def labelCsvArg = labelCsv.name != 'NO_FILE' ? "${labelCsv}" : ""
+    """
+    echo collect_volumes_nifti.sh ${labelCsvArg} ${input} > ${input.baseName}_volume_output.tsv
+    """
+}
+
+process combineVolumes {
+
+<<<<<<< Updated upstream
+  publishDir path:"${params.outputDir}/labels/majorityvote/collectedVolumes"
+=======
+  publishDir path:"${params.outputDir}/labels/majorityvote/collectedVolumes", mode: "rellink"
+>>>>>>> Stashed changes
+
+  input:
+    path files 
+  output:
+    path "combined_volume_output.tsv"
+
+  script:
+    """
+    cat ${files[0]} > combined_volume_output.tsv
+    for file in ${files.tail().join(" ")}; do
+        tail -n +2 \$file >> combined_volume_output.tsv
+    done
+    """
 }
 
 workflow resampleCanditateLabels {
@@ -240,6 +288,11 @@ workflow MAGeTBrain {
     // Use transforms to resample all candidate labels to subject space
     resampleCanditateLabels(registerAtlasesTemplates.out.transforms, registerTemplatesSubjects.out.transforms, subjects, labels)
     | groupTuple(by: [0, 1]) | majorityVote
+
+    emit: 
+        majorityVoteOutput = majorityVote.out
+
+    
 }
 
 workflow {
@@ -248,17 +301,41 @@ workflow {
   def atlases = Channel.fromPath('inputs/atlases/*_' + params.primarySpectra + '.nii.gz')
                       .map { file -> tuple(file.simpleName.minus('_' + params.primarySpectra), file) }
   // Read in labels
-  // map the filename to a subject ID for later use
   def labels = Channel.fromPath( 'inputs/atlases/*_label_*.nii.gz' )
                       .map { file -> tuple(file.simpleName - ~/_label.*/, (file.simpleName =~ /_label.*/)[0], file) }
   // Read in templates
-  // map the filename to a subject ID for later use
   def templates = Channel.fromPath('inputs/templates/*_' + params.primarySpectra + '.nii.gz')
                       .map { file -> tuple(file.simpleName.minus('_' + params.primarySpectra), file) }
   // Read in subjects
-  // map the filename to a subject ID for later use
   def subjects = Channel.fromPath( 'inputs/subjects/*_' + params.primarySpectra + '.nii.gz' )
                       .map { file -> tuple(file.simpleName.minus('_' + params.primarySpectra), file) }
 
-  MAGeTBrain(atlases, labels, templates, subjects)
-}
+  // Run MAGeTBrain 
+  def majorityVoteOutput = MAGeTBrain(atlases, labels, templates, subjects)
+    
+    // set the majorityVoteOutput as filesToProcess and check to if a label.csv file exists
+    majorityVoteOutput
+        .map { a_file ->
+            def matcher = a_file.name =~ /_label_([\w]+)\.nii.gz/
+            if (matcher.find()) {
+                def label = matcher.group(1)
+                def csvFile = file("${params.inputDir}/atlases/volume_label_${label}.csv")
+                
+                if (csvFile.exists()) {
+                    return [csvFile, a_file]  
+                } else {
+                    return [file("NO_FILE"), a_file]  
+                }
+            } else {
+                // if the file match does not exists null will be returned
+                // nextflow automatically handles nulls
+                return null  
+            }
+        }
+        .set { filesToProcess }
+    // collect the volumes and combine results
+    volumes = collectVolumes(filesToProcess)
+    // after all files process they will be collected
+    combineVolumes(volumes.collect())
+    }
+
