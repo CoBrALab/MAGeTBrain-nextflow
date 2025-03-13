@@ -19,7 +19,6 @@ A Nextflow implementation of the [Multiple Automatically Generated Templates (MA
 > [!IMPORTANT]  
 > All images should be in NIfTI format (`.nii.gz`)  
 > `.mnc` can be converted to NIfTI using `mnc2nii` from minc-toolkit-v2  
-> see below in section [Converting MINC to NIFTI](#converting-minc-to-nifti)  
 > [link to docs](https://bic-mni.github.io/man-pages/man/mnc2nii)
 
 1. Clone the repository:
@@ -30,35 +29,33 @@ cd MAGeTBrain-nextflow
 ```
 
 2. Input structure
-   Atlases and images should be structure in an input directory as follows:
+   Atlases, templates and subjects need to be in a specific structure in the `inputs` directory.
+   Optionally labels for each `<atlasname>_label_<labelname1.nii.gz` should be included in a `labels` directory.
+   These optional labels are for collecting the volumes of the majority votes.
+   Atlases, templates, subjects and Optionally labels should be structure in an input directory as follows:
 
 ```bash
-inputs/
-├── atlases/
-│   ├── atlas1_T1w.nii.gz
-│   ├── atlas1_label_*.nii.gz
-│   ├── atlas2_T1w.nii.gz
-│   ├── atlas2_label_*.nii.gz
+inputs
+├── atlases
+│   ├── atlas1_label_<labelname1>.nii.gz
+│   ├── atlas1_label_<labelname2>.nii.gz
+│   ├── atlas1_T1w.nii.gz
 │   └── ...
-└── subjects/
-    ├── subject1_T1w.nii.gz
-    ├── subject2_T1w.nii.gz
+├── subjects
+│   ├── subject1_T1w.nii.gz
+│   ├── subject2_T1w.nii.gz
+│   ├── subject3_T1w.nii.gz
+│   ├── subject4_T1w.nii.gz
+│   ├── subject5_T1w.nii.gz
+│   └── ...
+├── templates
+│   ├── subject2_T1w.nii.gz
+│   ├── subject5_T1w.nii.gz
+│   └── ...
+└── labels
+    ├── <labelname1>_volume_labels.csv
+    ├── <labelname2>_volume_labels.csv
     └── ...
 ```
 
-## Converting MINC to NIFTI
-
-A docker image can be pulled with the minc-toolkit-v2
-
-```bash
-docker pull nistmni/minc-toolkit:1.9.16
-# next mount your volumne in the container
-docker run -it -v /path/to/dir:/home/nistmni/input
-# now you should be in the docker shell
-# add the toolkit bin to the path
-export PATH=$PATH:/opt/minc/1.9.16/bin
-# next perform the conversion
-mnc2nii input.mnc output.nii
-```
-
-The `.nii` files will now be in the directory where the original `.mnc` files were.
+3. When the `inputs` directory has been set-up as above the workflow can be run with the following command `nextflow magetbrain.nf`
