@@ -5,34 +5,33 @@
 # 1,name
 # 2,name
 # etc
+#  _label_([\w]+)\.nii\.gz|\W([\w]+)_volume_labels\.csv
+#  This Script writes to stdout which is capture by nextflow
 
 set -euo pipefail
 
 firstarg=${1:-}
 if ! [[  ( $firstarg = *csv ) ||  ( $firstarg = *nii ) || ( $firstarg = *nii.gz ) ]]; then
-    echo "usage: $0 [ label-mapping.csv ] input.nii.gz [ input2.nii.gz ... inputN.nii.gz ]"
+    echo "usage: $0 [ volume_label_{label}.csv ] input.nii.gz [ input2.nii.gz ... inputN.nii.gz ]"
     exit 1
 fi
 
-output_file="collected_volumes.tsv"
 label_csv=""
 
 if [[ "$1" == *csv ]]; then
     label_csv="$1"
     shift
 fi
-
 temp_dir=$(mktemp -d)
-echo "Using temporary directory: $temp_dir"
 # rm on exit
 trap 'rm -rf "$temp_dir"' EXIT
 
 for file in "$@"; do
+
     # strip suffix
     file_basename=$(basename "$file")
     result_file="$temp_dir/${file_basename}.out"
     
-    echo "Processing $file..."
     
     LabelGeometryMeasures 3 "$file" "none" > "$result_file"
     
@@ -51,6 +50,7 @@ for file in "$@"; do
                 split(line, parts, ",");
                 label_num = parts[1];
                 label_name = parts[2];
+                # associative array contain the names and numbers from the label.csv
                 labels[label_num] = label_name;
             }
             close(label_file);
@@ -63,7 +63,7 @@ for file in "$@"; do
             next;
         }
         {
-            # Extract the label number from the second column
+            # Extract the label number from the second column of the LabelGeometryMeasures output
             label_num = $2;
             if (label_num in labels) {
                 label_text = labels[label_num];
@@ -76,12 +76,7 @@ for file in "$@"; do
         # No label CSV, just add empty columns
         awk 'NR==1 {print "LabelNumber\tLabelName\t" $0; next} {print $2 "\tUnknown\t" $0}' "${result_file}.with_subject" > "${result_file}.final"
     fi
-    
-    if [ ! -f "$output_file" ]; then
-        cat "${result_file}.final" > "$output_file"
-    else
-        tail -n +2 "${result_file}.final" >> "$output_file"
-    fi
+    # write to stdout     
+    cat "${result_file}.final" 
 done
 
-echo "Processing complete. Results saved to $output_file"
