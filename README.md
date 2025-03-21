@@ -30,9 +30,17 @@ cd MAGeTBrain-nextflow
 
 2. Input structure
    Atlases, templates and subjects need to be in a specific structure in the `inputs` directory.
-   Optionally labels for each `<atlasname>_label_<labelname1.nii.gz` should be included in a `labels` directory.
+   Optionally labels for each `<atlasname>_label_<labelname1>.nii.gz` should be included in a `labels` directory.
    These optional labels are for collecting the volumes of the majority votes.
    Atlases, templates, subjects and Optionally labels should be structure in an input directory as follows:
+
+> [!IMPORTANT]  
+> A note about labels for use with `collect_volumes_nifti_sh`
+> Nextflow uses regex to match `volume_label_<label>.csv` to the corresponding majorityVote ouput
+> Specifically it matches on `\w`, that is any letter, digit or underscore. Equivalent to [a-zA-Z0-9_].
+> /_label_([\w]+)\.nii.gz/
+> \_This means only alphanumerical characters can be used\_
+> other characters like `-  , . < >` etc will cause errors
 
 ```bash
 inputs
@@ -53,8 +61,8 @@ inputs
 │   ├── subject5_T1w.nii.gz
 │   └── ...
 └── labels
-    ├── <labelname1>_volume_labels.csv
-    ├── <labelname2>_volume_labels.csv
+    ├── volume_labels_<labelname1>.csv
+    ├── volume_labels_<labelname2>.csv
     └── ...
 ```
 
