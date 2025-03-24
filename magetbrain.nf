@@ -315,7 +315,7 @@ workflow {
             def matcher = a_file.name =~ /_label_([\w]+)\.nii.gz/
             if (matcher.find()) {
                 def label = matcher.group(1)
-                def csvFile = file("${params.inputDir}/labels/volume_label_${label}.csv")
+                def csvFile = file("${params.inputDir}/atlases/volume_label_${label}.csv")
                 
                 if (csvFile.exists()) {
                     return [csvFile, a_file]  
