@@ -71,11 +71,18 @@ for file in "$@"; do
                 label_text = "Unknown";
             }
             print label_num, label_text, $0;
-        }' "${result_file}.with_subject" > "${result_file}.final"
+        }' "${result_file}.with_subject" > "${result_file}.pre_sort"
     else
         # No label CSV, just add empty columns
-        awk 'NR==1 {print "LabelNumber\tLabelName\t" $0; next} {print $2 "\tUnknown\t" $0}' "${result_file}.with_subject" > "${result_file}.final"
+        awk 'NR==1 {print "LabelNumber\tLabelName\t" $0; next} {print $2 "\tUnknown\t" $0}' "${result_file}.with_subject" > "${result_file}.pre_sort"
     fi
+    # rearragne columns, change a header, sort on Subjectlabel then LabelNumber
+    awk -F'\t' -v OFS='\t' '{
+        print $3, $1, $2, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+    }' "${result_file}.pre_sort" | \
+    sed '1,1 s/Subject/SubjectLabels/g' | \
+    (head -n 1 && tail -n +2 | sort -k1 -k2) > "${result_file}.final"
+
     # write to stdout     
     cat "${result_file}.final" 
 done
