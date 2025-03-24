@@ -192,13 +192,13 @@ process collectVolumes {
   stub:
     def labelCsvArg = labelCsv.name != 'NO_FILE' ? "${labelCsv}" : ""
     """
-    echo collect_volumes_nifti.sh ${labelCsvArg} ${input} > volume_output.tsv
+    echo collect_volumes_nifti.sh ${labelCsvArg} ${input} > ${input.baseName}_volume_output.tsv
     """
 }
 
 process combineVolumes {
 
-  publishDir path:"${params.outputDir}/labels/majorityvote/collectVolumes"
+  publishDir path:"${params.outputDir}/labels/majorityvote/collectedVolumes"
 
   input:
     path files 

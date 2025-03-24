@@ -12,7 +12,7 @@ A Nextflow implementation of the [Multiple Automatically Generated Templates (MA
 
 - [Nextflow](https://www.nextflow.io/) (version 20.07.1 or later)
 - [Docker](https://www.docker.com/) or [Singularity](https://sylabs.io/singularity/)
-- MINC Toolkit (provided in the Docker container) _optional_
+- [ANTs](https://github.com/ANTsX/ANTs)
 
 ## Quick Start
 
@@ -30,9 +30,9 @@ cd MAGeTBrain-nextflow
 
 2. Input structure
    Atlases, templates and subjects need to be in a specific structure in the `inputs` directory.
-   Optionally labels for each `<atlasname>_label_<labelname1>.nii.gz` should be included in a `labels` directory.
+   Labels for each atlas `<atlasname>_label_<labelname1>.nii.gz` should be included in the `atlases` directory.
    These optional labels are for collecting the volumes of the majority votes.
-   Atlases, templates, subjects and Optionally labels should be structure in an input directory as follows:
+   Atlases, templates, subjects and labels should be structured in an input directory as follows:
 
 > [!IMPORTANT]  
 > A note about labels for use with `collect_volumes_nifti_sh`
@@ -48,6 +48,8 @@ inputs
 │   ├── atlas1_label_<labelname1>.nii.gz
 │   ├── atlas1_label_<labelname2>.nii.gz
 │   ├── atlas1_T1w.nii.gz
+│   ├── volume_labels_<labelname1>.csv
+│   ├── volume_labels_<labelname2>.csv
 │   └── ...
 ├── subjects
 │   ├── subject1_T1w.nii.gz
@@ -56,13 +58,9 @@ inputs
 │   ├── subject4_T1w.nii.gz
 │   ├── subject5_T1w.nii.gz
 │   └── ...
-├── templates
-│   ├── subject2_T1w.nii.gz
-│   ├── subject5_T1w.nii.gz
-│   └── ...
-└── labels
-    ├── volume_labels_<labelname1>.csv
-    ├── volume_labels_<labelname2>.csv
+└── templates
+    ├── subject2_T1w.nii.gz
+    ├── subject5_T1w.nii.gz
     └── ...
 ```
 

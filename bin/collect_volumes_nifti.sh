@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 # Script to collect volumes in parallel, and use names from a csv if available
 # Modified to work with NIFTI files and use LabelGeometryMeasures
 # CSV Format
