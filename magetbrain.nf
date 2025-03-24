@@ -1,7 +1,5 @@
-params.primarySpectra = 'T1w'
-params.inputDir = 'inputs'
-params.outputDir = 'output'
-params.fast = ''
+include {validateInputDirectoryStructure} from "./validateInputDirectoryStructure.nf"
+
 process registerAffine {
   label 'registerAffine'
   cpus 8
@@ -186,7 +184,7 @@ process collectVolumes {
     
     def labelCsvArg = labelCsv.name != 'NO_FILE' ? "${labelCsv}" : ""
     """
-    collect_volumes_nifti.sh ${labelCsvArg} ${input} > ${input.baseName}_volume_output.tsv
+    collect_volumes_nifti.sh ${labelCsvArg} ${input} > ${input.baseName}_volume_output.tsv 
     """
 
   stub:
@@ -198,11 +196,7 @@ process collectVolumes {
 
 process combineVolumes {
 
-<<<<<<< Updated upstream
-  publishDir path:"${params.outputDir}/labels/majorityvote/collectedVolumes"
-=======
   publishDir path:"${params.outputDir}/labels/majorityvote/collectedVolumes", mode: "rellink"
->>>>>>> Stashed changes
 
   input:
     path files 
@@ -296,22 +290,34 @@ workflow MAGeTBrain {
 }
 
 workflow {
-  // Read in atlas files, use primarySpectra option to determine which will be the primary match
-  // map the filename to a subject ID for later use
-  def atlases = Channel.fromPath('inputs/atlases/*_' + params.primarySpectra + '.nii.gz')
-                      .map { file -> tuple(file.simpleName.minus('_' + params.primarySpectra), file) }
-  // Read in labels
-  def labels = Channel.fromPath( 'inputs/atlases/*_label_*.nii.gz' )
-                      .map { file -> tuple(file.simpleName - ~/_label.*/, (file.simpleName =~ /_label.*/)[0], file) }
-  // Read in templates
-  def templates = Channel.fromPath('inputs/templates/*_' + params.primarySpectra + '.nii.gz')
-                      .map { file -> tuple(file.simpleName.minus('_' + params.primarySpectra), file) }
-  // Read in subjects
-  def subjects = Channel.fromPath( 'inputs/subjects/*_' + params.primarySpectra + '.nii.gz' )
-                      .map { file -> tuple(file.simpleName.minus('_' + params.primarySpectra), file) }
 
-  // Run MAGeTBrain 
-  def majorityVoteOutput = MAGeTBrain(atlases, labels, templates, subjects)
+    log.info "Validating input directory structure..."
+    validateInputDirectoryStructure()
+
+        def atlasesDir = file("${params.inputDir}/atlases")
+        def subjectsDir = file("${params.inputDir}/subjects")
+        def templatesDir = file("${params.inputDir}/templates")
+
+        def T1wPattern = "*${params.primarySpectra}.nii.gz"
+        def atlasLabelPattern = "*_label_*.nii.gz"
+        def atlasCsvPattern = "volume_labels_*.csv"
+
+      def atlases = Channel
+             .fromPath("${atlasesDir}/${T1wPattern}") 
+                          .map { file -> tuple(file.simpleName.minus('_' + params.primarySpectra), file) }
+      def labels = Channel
+             .fromPath("${atlasesDir}/${atlasLabelPattern}")
+                          .map { file -> tuple(file.simpleName - ~/_label.*/, (file.simpleName =~ /_label.*/)[0], file) }
+      def templates = Channel
+             .fromPath("${templatesDir}/${T1wPattern}")
+                          .map { file -> tuple(file.simpleName.minus('_' + params.primarySpectra), file) }
+      def subjects = Channel
+             .fromPath("${subjectsDir}/${T1wPattern}")
+                          .map { file -> tuple(file.simpleName.minus('_' + params.primarySpectra), file) }
+
+    log.info "Running MAGeTBrain..."
+    majorityVoteOutput= MAGeTBrain(atlases, labels, templates, subjects)
+    log.info "MAGeTBrain finished."
     
     // set the majorityVoteOutput as filesToProcess and check to if a label.csv file exists
     majorityVoteOutput
@@ -319,12 +325,13 @@ workflow {
             def matcher = a_file.name =~ /_label_([\w]+)\.nii.gz/
             if (matcher.find()) {
                 def label = matcher.group(1)
-                def csvFile = file("${params.inputDir}/atlases/volume_label_${label}.csv")
+                def csvFile = file("${params.inputDir}/atlases/volume_labels_${label}.csv")
                 
                 if (csvFile.exists()) {
                     return [csvFile, a_file]  
                 } else {
                     return [file("NO_FILE"), a_file]  
+
                 }
             } else {
                 // if the file match does not exists null will be returned
