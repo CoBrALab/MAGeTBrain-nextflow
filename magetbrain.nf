@@ -146,7 +146,7 @@ process majorityVote {
   // memory '16GB'
   // time '30min'
 
-  publishDir 'output/labels/majorityvote'
+  publishDir 'output/labels/majorityvote', mode: "rellink"
 
   input:
     tuple val(subjectId),
@@ -198,7 +198,11 @@ process collectVolumes {
 
 process combineVolumes {
 
+<<<<<<< Updated upstream
   publishDir path:"${params.outputDir}/labels/majorityvote/collectedVolumes"
+=======
+  publishDir path:"${params.outputDir}/labels/majorityvote/collectedVolumes", mode: "rellink"
+>>>>>>> Stashed changes
 
   input:
     path files 
