@@ -310,7 +310,7 @@ workflow {
   def majorityVoteOutput = MAGeTBrain(atlases, labels, templates, subjects)
     
     // set the majorityVoteOutput as filesToProcess and check to if a label.csv file exists
-   majorityVoteOutput 
+    majorityVoteOutput
         .map { a_file ->
             def matcher = a_file.name =~ /_label_([\w]+)\.nii.gz/
             if (matcher.find()) {
@@ -323,7 +323,9 @@ workflow {
                     return [file("NO_FILE"), a_file]  
                 }
             } else {
-                return [null, a_file]
+                // if the file match does not exists null will be returned
+                // nextflow automatically handles nulls
+                return null  
             }
         }
         .set { filesToProcess }
