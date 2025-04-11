@@ -145,8 +145,7 @@ process majorityVote {
   // memory '16GB'
   // time '30min'
 
-  publishDir 'output/labels/majorityvote', mode: "rellink"
-
+  publishDir "${params.outputDir}/labels/majorityvote", mode: "rellink"
   input:
     tuple val(subjectId),
           val(labelExt),
@@ -168,7 +167,7 @@ process majorityVote {
   """
 }
 
-workflow resampleCanditateLabels {
+workflow resampleCandidateLabels {
   take:
     atlasTemplateTransforms
     templateSubjectTransforms
@@ -236,7 +235,7 @@ workflow MAGeTBrain {
     // Run template-subject registration
     registerTemplatesSubjects(templates, subjects)
     // Use transforms to resample all candidate labels to subject space
-    resampleCanditateLabels(registerAtlasesTemplates.out.transforms, registerTemplatesSubjects.out.transforms, subjects, labels)
+    resampleCandidateLabels(registerAtlasesTemplates.out.transforms, registerTemplatesSubjects.out.transforms, subjects, labels)
     | groupTuple(by: [0, 1]) | majorityVote
 
     emit: 

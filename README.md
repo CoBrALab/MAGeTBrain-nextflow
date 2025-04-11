@@ -38,9 +38,9 @@ cd MAGeTBrain-nextflow
 > A note about labels for use with `collect_volumes_nifti_sh`
 > Nextflow uses regex to match `volume_label_<label>.csv` to the corresponding majorityVote ouput
 > Specifically it matches on `\w`, that is any letter, digit or underscore. Equivalent to [a-zA-Z0-9_].
-> /_label_([\w]+)\.nii.gz/
+> `/_label_([\w]+)\.nii.gz/`.
 > \_This means only alphanumerical characters can be used\_
-> other characters like `-  , . < >` etc will cause errors
+> other characters like `-  , . < >` etc. will cause errors
 
 ```bash
 inputs
@@ -64,4 +64,4 @@ inputs
     └── ...
 ```
 
-3. When the `inputs` directory has been set-up as above the workflow can be run with the following command `nextflow magetbrain.nf`
+3. When the `inputs` directory has been set up as above, the workflow can be run with the following command `nextflow magetbrain.nf`

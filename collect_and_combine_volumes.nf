@@ -14,7 +14,7 @@ process collectVolumes {
     
     def labelCsvArg = labelCsv.name != 'NO_FILE' ? "${labelCsv}" : ""
     """
-    collect_volumes_nifti.sh ${labelCsvArg} ${input} | tee ${input.baseName}_volume_output.tsv /tmp/apr-9_${input.baseName}
+    collect_volumes_nifti.sh ${labelCsvArg} ${input} > ${input.baseName}_volume_output.tsv 
     """
 
   stub:

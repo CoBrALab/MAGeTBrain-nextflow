@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 # Script to collect volumes in parallel, and use names from a csv if available
 # Modified to work with NIFTI files and use LabelGeometryMeasures
 # CSV Format
@@ -11,7 +11,7 @@
 set -euo pipefail
 
 firstarg=${1:-}
-if ! [[  ( $firstarg = *csv ) ||  ( $firstarg = *nii ) || ( $firstarg = *nii.gz ) ]]; then
+if ! [[  "$firstarg" =~ \.(csv|CSV|nii|nii\.gz)$ ]]; then
     echo "usage: $0 [ volume_label_{label}.csv ] input.nii.gz [ input2.nii.gz ... inputN.nii.gz ]"
     exit 1
 fi
@@ -76,7 +76,7 @@ for file in "$@"; do
         # No label CSV, just add empty columns
         awk 'NR==1 {print "LabelNumber\tLabelName\t" $0; next} {print $2 "\tNA\t" $0}' "${result_file}.with_subject" > "${result_file}.pre_sort"
     fi
-    # rearragne columns (redundant Label column removed), rename Subject to SubjectLabels
+    # rearrange columns (redundant Label column removed), rename Subject to SubjectLabels
     # and finally sort on SubjectLabels and then LabelNumber
     #
     # transformed from:
