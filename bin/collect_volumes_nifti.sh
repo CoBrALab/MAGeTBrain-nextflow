@@ -68,21 +68,50 @@ for file in "$@"; do
             if (label_num in labels) {
                 label_text = labels[label_num];
             } else {
-                label_text = "Unknown";
+                label_text = "NA";
             }
             print label_num, label_text, $0;
         }' "${result_file}.with_subject" > "${result_file}.pre_sort"
     else
         # No label CSV, just add empty columns
-        awk 'NR==1 {print "LabelNumber\tLabelName\t" $0; next} {print $2 "\tUnknown\t" $0}' "${result_file}.with_subject" > "${result_file}.pre_sort"
+        awk 'NR==1 {print "LabelNumber\tLabelName\t" $0; next} {print $2 "\tNA\t" $0}' "${result_file}.with_subject" > "${result_file}.pre_sort"
     fi
-    # rearragne columns, change a header, sort on Subjectlabel then LabelNumber
+    # rearragne columns (redundant Label column removed), rename Subject to SubjectLabels
+    # and finally sort on SubjectLabels and then LabelNumber
+    #
+    # transformed from:
+    #
+    # LabelNumber, LabelName, Subject, Label, VolumeIn Voxels, VolumeInMillimeters, 
+    # SurfaceAreaInMillimetersSquared, Eccentricity, Elongation, Roundness, Flatness,
+    # Centroid, AxesLengths, BoundingBox
+    # 
+    # transformed to: 
+    #
+    # SubjectLabels, LabelNumber, LabelName, VolumeIn Voxels, VolumeInMillimeters, 
+    # SurfaceAreaInMillimetersSquared, Eccentricity, Elongation, Roundness, Flatness,
+    # Centroid, AxesLengths, BoundingBox
+    #
+    # sorting should yield an output like:
+    # SubjectLabels LabelNumber ...
+    # *74_amy 2 ...
+    # *74_amy 10 ...
+    # *74_cer 1 ...
+    # *74_cer 2 ...
+    # *74_cer 10 ...
+    # *75_amy 2 ...
+    # *75_amy 10 ...
+    # *75_cer 1 ...
+    # *75_cer 2 ...
+    # *75_cer 10 ...
+    #
     awk -F'\t' -v OFS='\t' '{
         print $3, $1, $2, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
-    }' "${result_file}.pre_sort" | \
-    sed '1,1 s/Subject/SubjectLabels/g' | \
-    (head -n 1 && tail -n +2 | sort -k1 -k2) > "${result_file}.final"
-
+    }' "${result_file}.pre_sort"  > "${result_file}.col_rearranged"
+    # rename column
+    sed -i '1,1 s/Subject/SubjectLabels/g' "${result_file}.col_rearranged"
+    # sort on Subjectlabel then on LabelNumber
+    header=$(head -n 1 "${result_file}.col_rearranged")
+    (echo "$header"; tail -n +2 "${result_file}.col_rearranged" | sort -t $'\t' -k1,1 -k2,2n) > "${result_file}.final"
     # write to stdout     
     cat "${result_file}.final" 
 done
