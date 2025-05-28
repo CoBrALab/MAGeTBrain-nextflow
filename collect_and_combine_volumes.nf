@@ -1,3 +1,5 @@
+nextflow.enable.dsl=2 
+
 process collectVolumes {
   label 'collectVolumes'
   cpus 4

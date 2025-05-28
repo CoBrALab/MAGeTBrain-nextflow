@@ -1,3 +1,4 @@
+nexflow.enable.dsl=2 
 include {validateInputDirectoryStructure} from "./validateInputDirectoryStructure.nf"
 include {collectVolumes} from "./collect_and_combine_volumes.nf"
 include {combineVolumes} from "./collect_and_combine_volumes.nf"
