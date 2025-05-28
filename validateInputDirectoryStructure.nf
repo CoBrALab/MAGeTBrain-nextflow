@@ -1,3 +1,5 @@
+ nextflow.enable.dsl=2 
+
   workflow validateInputDirectoryStructure {
     main:
         log.info """
