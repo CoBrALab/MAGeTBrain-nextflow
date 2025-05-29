@@ -245,6 +245,40 @@ workflow MAGeTBrain {
     
 }
 
+workflow collect_and_combine_volumes{
+
+  take: majorityVoteOutput
+
+  main:
+    majorityVoteOutput
+        .map { a_file ->
+            def matcher = a_file.name =~ /_label_([\w]+)\.nii.gz/
+            if (matcher.find()) {
+                def label = matcher.group(1)
+                def csvFile = file("${params.inputDir}/atlases/volume_labels_${label}.csv")
+                
+                if (csvFile.exists()) {
+                    return [csvFile, a_file]  
+                } else {
+                    return [file("NO_FILE"), a_file]  
+
+                }
+            } else {
+                // if the file match does not exists null will be returned
+                // nextflow automatically handles nulls
+                return null  
+            }
+        }
+        .set { filesToProcess }
+    // collect the volumes and combine results
+    volumes = collectVolumes(filesToProcess)
+    // after all files process they will be collected
+    combineVolumes(volumes.collect())
+
+    emit: 
+
+    }
+
 workflow {
 
     log.info "Validating input directory structure..."
@@ -273,32 +307,8 @@ workflow {
 
     log.info "Running MAGeTBrain..."
     majorityVoteOutput= MAGeTBrain(atlases, labels, templates, subjects)
+    collect_and_combine_volumes(majorityVoteOutput)
     log.info "MAGeTBrain finished."
     
-    // set the majorityVoteOutput as filesToProcess and check to if a label.csv file exists
-    majorityVoteOutput
-        .map { a_file ->
-            def matcher = a_file.name =~ /_label_([\w]+)\.nii.gz/
-            if (matcher.find()) {
-                def label = matcher.group(1)
-                def csvFile = file("${params.inputDir}/atlases/volume_labels_${label}.csv")
-                
-                if (csvFile.exists()) {
-                    return [csvFile, a_file]  
-                } else {
-                    return [file("NO_FILE"), a_file]  
-
-                }
-            } else {
-                // if the file match does not exists null will be returned
-                // nextflow automatically handles nulls
-                return null  
-            }
-        }
-        .set { filesToProcess }
-    // collect the volumes and combine results
-    volumes = collectVolumes(filesToProcess)
-    // after all files process they will be collected
-    combineVolumes(volumes.collect())
     }
 
