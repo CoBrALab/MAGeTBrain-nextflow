@@ -1,4 +1,4 @@
-nexflow.enable.dsl=2 
+nextflow.enable.dsl=2 
 include {validateInputDirectoryStructure} from "./validateInputDirectoryStructure.nf"
 include {collectVolumes} from "./collect_and_combine_volumes.nf"
 include {combineVolumes} from "./collect_and_combine_volumes.nf"
@@ -245,8 +245,7 @@ workflow MAGeTBrain {
     
 }
 
-workflow collect_and_combine_volumes{
-
+workflow collectAndCombineVolumes{
   take: majorityVoteOutput
 
   main:
@@ -276,7 +275,7 @@ workflow collect_and_combine_volumes{
     combineVolumes(volumes.collect())
 
     emit: 
-
+        null
     }
 
 workflow {
@@ -307,7 +306,7 @@ workflow {
 
     log.info "Running MAGeTBrain..."
     majorityVoteOutput= MAGeTBrain(atlases, labels, templates, subjects)
-    collect_and_combine_volumes(majorityVoteOutput)
+    collectAndCombineVolumes(majorityVoteOutput)
     log.info "MAGeTBrain finished."
     
     }
