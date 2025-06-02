@@ -151,18 +151,18 @@ The outputs for this function are as follows with some additional manipulation b
 The Nextflow binary is required.
 
 - Download from [nextflow.io](https://www.nextflow.io/)
-- The binary should be placed in `~/.local/bin`.
-- And the bin directory should be added to your path.
-- ensure nextflow can run
-  The following steps need to only be done once.
 
 ```bash
 curl -s https://get.nextflow.io | bash
 ```
 
+- The binary should be placed in `~/.local/bin`.
+
 ```bash
 mv nextflow ~/.local/bin
 ```
+
+- And the bin directory should be added to your path. And your `.bashrc` needs to be sourced.
 
 ```bash
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
@@ -172,17 +172,20 @@ echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
+- ensure nextflow can run
+  The following steps need to only be done once.
+
 ```bash
 nextflow help
 ```
 
 ### Loading modules
 
-Now the correct modules need to be loaded
+Now the correct modules need to be loaded.
 This needs to be done every time.
 
 > [!IMPORTANT]
-> Do not load modules from `.bashrc.`
+> Do not load modules from `.bashrc`.
 
 ```bash
 module load cobralab
@@ -193,4 +196,4 @@ module load openjdk/17.0.9
 > As of writing this openjdk/17.0.9 was the latest version on Niagara.
 > Nextflow needs Java Version 17 or later
 
-Now follow steps for [quickstart](#Quick-Start)
+Now follow steps for [quick start](#Quick-Start)
