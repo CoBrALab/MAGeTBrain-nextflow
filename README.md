@@ -196,4 +196,20 @@ module load openjdk/17.0.9
 > As of writing this openjdk/17.0.9 was the latest version on Niagara.
 > Nextflow needs Java Version 17 or later
 
-Now follow steps for [quick start](#Quick-Start)
+### Run command on Niagara
+
+To ensure submission to SLURM the the Niagara profile must be used.
+This is provided in `nextflow.config` file and can be passed using the `--profile` flag.
+Other useful flags to pass are `-bg` to run in background and `-resume` to resume processing if there was an interuption. :w
+
+```bash
+nextflow run -bg magetbrain.nf -profile niagara -resume
+```
+
+> [!IMPORTANT]
+> A bug when running on Niagara requires and additional script to be run to collect volumes
+> This can be done on the login node without submitting job to SLURM
+
+```bash
+nextflow run collect_and_combine_volumes_niagara.nf
+```
