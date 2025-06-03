@@ -273,9 +273,6 @@ workflow collectAndCombineVolumes{
     volumes = collectVolumes(filesToProcess)
     // after all files process they will be collected
     combineVolumes(volumes.collect())
-
-    emit: 
-        null
     }
 
 workflow {
