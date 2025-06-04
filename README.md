@@ -25,7 +25,9 @@ image and fused. It is our hypothesis that by propogating labels to a template l
 we are able to make use of the neuroanatomical variability of the subjects in order to 'fine tune'
 each individual subject's segmentation.
 
-## Prerequisites
+## Requirements
+
+These are not requirements if running on Niagara [see below](#Running-on-Niagara)
 
 - [Nextflow](https://www.nextflow.io/) (version 20.07.1 or later)
 - [Docker](https://www.docker.com/) or [Singularity](https://sylabs.io/singularity/)
@@ -141,3 +143,73 @@ The outputs for this function are as follows with some additional manipulation b
 | sub-031275_label_cer.nii.gz | 5           | L_VI       | 729            | 5832.000000         | 2740.769300                     | 0.990676     | 2.709235   | 0.571685  | 1.757259       | [21.1760, 25.2954, -36.7663]  | [11.6904, 20.5431, 55.6560] | [25, 34, 40, 42, 58, 48] |
 | sub-031275_label_cer.nii.gz | 6           | L_Crus_I   | 1056           | 8448.000000         | 4040.455378                     | 0.980065     | 2.243498   | 0.496466  | 2.344949       | [31.6046, 27.4819, -41.2604]  | [11.2453, 26.3697, 59.1605] | [19, 30, 38, 42, 56, 46] |
 | sub-031275_label_cer.nii.gz | 7           | L_Crus_II  | 1005           | 8040.000000         | 3930.752935                     | 0.989745     | 2.645862   | 0.493756  | 1.617023       | [23.8352, 34.2780, -49.6458]  | [14.6968, 23.7651, 62.8792] | [20, 29, 33, 42, 56, 42] |
+
+## Running on Niagara
+
+### Nextflow binary
+
+The Nextflow binary is required.
+
+- Download from [nextflow.io](https://www.nextflow.io/)
+
+```bash
+curl -s https://get.nextflow.io | bash
+```
+
+- The binary should be placed in `~/.local/bin`.
+
+```bash
+mv nextflow ~/.local/bin
+```
+
+- And the bin directory should be added to your path. And your `.bashrc` needs to be sourced.
+
+```bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+```
+
+```bash
+source ~/.bashrc
+```
+
+- ensure nextflow can run
+  The following steps need to only be done once.
+
+```bash
+nextflow help
+```
+
+### Loading modules
+
+Now the correct modules need to be loaded.
+This needs to be done every time.
+
+> [!IMPORTANT]
+> Do not load modules from `.bashrc`.
+
+```bash
+module load cobralab
+module load openjdk/17.0.9
+```
+
+> [!NOTE]  
+> As of writing this openjdk/17.0.9 was the latest version on Niagara.
+> Nextflow needs Java Version 17 or later
+
+### Run command on Niagara
+
+To ensure submission to SLURM the the Niagara profile must be used.
+This is provided in `nextflow.config` file and can be passed using the `--profile` flag.
+Other useful flags to pass are `-bg` to run in background and `-resume` to resume processing if there was an interuption. :w
+
+```bash
+nextflow run -bg magetbrain.nf -profile niagara -resume
+```
+
+> [!IMPORTANT]
+> A bug when running on Niagara requires and additional script to be run to collect volumes
+> This can be done on the login node without submitting job to SLURM
+
+```bash
+nextflow run collect_and_combine_volumes_niagara.nf
+```
