@@ -1,4 +1,7 @@
 nextflow.enable.dsl=2 
+
+params.registrationOnly = false
+
 include {validateInputDirectoryStructure} from "./validateInputDirectoryStructure.nf"
 include {collectVolumes} from "./collect_and_combine_volumes.nf"
 include {combineVolumes} from "./collect_and_combine_volumes.nf"
@@ -150,7 +153,7 @@ process majorityVote {
   input:
     tuple val(subjectId),
           val(labelExt),
-          path('candidate?.nii.gz')
+          path('candidate*.nii.gz')
 
   output:
     path "${subjectId}${labelExt}.nii.gz"
@@ -158,12 +161,12 @@ process majorityVote {
   script:
   """
   ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=${task.cpus} \
-  ImageMath 3 ${subjectId}${labelExt}.nii.gz MajorityVoting candidate?.nii.gz
+  ImageMath 3 ${subjectId}${labelExt}.nii.gz MajorityVoting candidate*.nii.gz
   """
 
   stub:
   """
-  echo ImageMath 3 ${subjectId}${labelExt}.nii.gz MajorityVoting candidate?.nii.gz
+  echo ImageMath 3 ${subjectId}${labelExt}.nii.gz MajorityVoting candidate*.nii.gz
   touch ${subjectId}${labelExt}.nii.gz
   """
 }
@@ -300,11 +303,17 @@ workflow {
       def subjects = Channel
              .fromPath("${subjectsDir}/${T1wPattern}")
                           .map { file -> tuple(file.simpleName.minus('_' + params.primarySpectra), file) }
+    if (params.registrationOnly){
+        log.info "Running registration only..."
+        registerAtlasesTemplates(atlases, templates)
+        registerTemplatesSubjects(templates, subjects)
 
-    log.info "Running MAGeTBrain..."
-    majorityVoteOutput= MAGeTBrain(atlases, labels, templates, subjects)
-    collectAndCombineVolumes(majorityVoteOutput)
-    log.info "MAGeTBrain finished."
-    
+        } else {
+
+        log.info "Running MAGeTBrain..."
+        majorityVoteOutput= MAGeTBrain(atlases, labels, templates, subjects)
+        collectAndCombineVolumes(majorityVoteOutput)
+                
+        }
     }
 
