@@ -199,12 +199,12 @@ module load openjdk/17.0.9
 ### Run command on Niagara
 
 > [!IMPORTANT]
-> Nextflow requires the ssh session to remain active. This can be achieved by keeping the terminal used to ssh into Niagara open and running. 
-> A more convient approach is to use a tool that allows persistent server sessions like 
+> Nextflow requires the ssh session to remain active. This can be achieved by keeping the terminal used to ssh into Niagara open and running.
+> A more convient approach is to use a tool that allows persistent server sessions like
 > [Tmux](https://github.com/tmux/tmux/wiki) or [Screen](https://www.gnu.org/software/screen/manual/screen.html).
 
 To ensure submission to SLURM the the Niagara profile must be used.
-This is provided in `nextflow.config` file and can be passed using the `--profile` flag.
+This is provided in `nextflow.config` file and can be passed using the `-profile` flag.
 Other useful flags to pass are `-bg` to run in background and `-resume` to resume processing if there was an interuption.
 
 ```bash
