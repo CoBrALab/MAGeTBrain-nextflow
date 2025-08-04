@@ -150,7 +150,7 @@ process majorityVote {
   input:
     tuple val(subjectId),
           val(labelExt),
-          path('candidate?.nii.gz')
+          path('candidate*.nii.gz')
 
   output:
     path "${subjectId}${labelExt}.nii.gz"
@@ -158,12 +158,12 @@ process majorityVote {
   script:
   """
   ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=${task.cpus} \
-  ImageMath 3 ${subjectId}${labelExt}.nii.gz MajorityVoting candidate?.nii.gz
+  ImageMath 3 ${subjectId}${labelExt}.nii.gz MajorityVoting candidate*.nii.gz
   """
 
   stub:
   """
-  echo ImageMath 3 ${subjectId}${labelExt}.nii.gz MajorityVoting candidate?.nii.gz
+  echo ImageMath 3 ${subjectId}${labelExt}.nii.gz MajorityVoting candidate*.nii.gz
   touch ${subjectId}${labelExt}.nii.gz
   """
 }
