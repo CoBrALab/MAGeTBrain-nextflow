@@ -181,14 +181,23 @@ workflow resampleCandidateLabels {
   main:
     // Use map to reorder the atlasTemplateTransforms map, because combine cannot use anything other than the first column
     // Combine the maps to produce all possible paths
-    atlasTemplateTransforms
-                          .map { it -> [ it[1], it[0], it[2], it[3] ] }
-                          .combine(templateSubjectTransforms, by: 0)
-                          .map { it -> [ it[1], it[0], it[2], it[3], it[4], it[5], it[6] ] }
-                          .combine(labels, by: 0)
-                          .map { it -> [ it[4], it[0], it[1], it[2], it[3], it[5], it[6], it[7], it[8] ] }
-                          .combine(subjects, by: 0)
-                          .map { it -> [ it[1], it[2], it[0], it[7], it[3], it[4], it[5], it[6], it[8], it[9] ] }
+        atlasTemplate = atlasTemplateTransforms
+            .map { atlasId, templateId, atlasAffine, atlasWarp -> [templateId, atlasId, atlasAffine, atlasWarp] }
+
+        templateCombined = atlasTemplate
+            .combine(templateSubjectTransforms, by: 0)
+            .map { templateId, atlasId, atlasAffine, atlasWarp, subjectId, templateAffine, templateWarp -> 
+                   [atlasId, templateId, atlasAffine, atlasWarp, subjectId, templateAffine, templateWarp] }
+
+        labelsCombined = templateCombined
+            .combine(labels, by: 0)
+            .map { atlasId, templateId, atlasAffine, atlasWarp, subjectId, templateAffine, templateWarp, labelFile, labelExt ->
+                   [subjectId, atlasId, templateId, atlasAffine, atlasWarp, templateAffine, templateWarp, labelFile, labelExt] }
+
+        result = labelsCombined
+            .combine(subjects, by: 0)
+            .map { subjectId, atlasId, templateId, atlasAffine, atlasWarp, templateAffine, templateWarp, labelFile, labelExt, subjectMask ->
+                   [atlasId, templateId, subjectId, labelFile, atlasAffine, atlasWarp, templateAffine, templateWarp, labelExt, subjectMask] }
                           | resampleLabel
 
   emit:
