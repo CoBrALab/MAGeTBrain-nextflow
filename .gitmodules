@@ -3,4 +3,4 @@
 	url = https://github.com/CoBrALab/minc-toolkit-extras.git
 [submodule "bin/antsRegistration_affine_SyN"]
 	path = bin/antsRegistration_affine_SyN
-	url = https://github.com/CoBrALab/antsRegistration_affine_SyN
+	url = https://github.com/CoBrALab/antsRegistration_affine_SyN.git

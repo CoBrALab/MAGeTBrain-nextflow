@@ -8,5 +8,5 @@ RUN \
         python-is-python3 \
         procps
 
-COPY bin/minc-toolkit-extras/antsRegistration_affine_SyN.sh /usr/local/bin
+COPY bin/antsRegistration_affine_SyN/antsRegistration_affine_SyN.sh /usr/local/bin
 COPY bin/minc-toolkit-extras/ants_generate_iterations.py /usr/local/bin
