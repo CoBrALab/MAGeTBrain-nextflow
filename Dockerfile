@@ -9,4 +9,3 @@ RUN \
         procps
 
 COPY bin/antsRegistration_affine_SyN/antsRegistration_affine_SyN.sh /usr/local/bin
-COPY bin/minc-toolkit-extras/ants_generate_iterations.py /usr/local/bin
