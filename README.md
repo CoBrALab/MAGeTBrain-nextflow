@@ -144,75 +144,43 @@ The outputs for this function are as follows with some additional manipulation b
 | sub-031275_label_cer.nii.gz | 6           | L_Crus_I   | 1056           | 8448.000000         | 4040.455378                     | 0.980065     | 2.243498   | 0.496466  | 2.344949       | [31.6046, 27.4819, -41.2604]  | [11.2453, 26.3697, 59.1605] | [19, 30, 38, 42, 56, 46] |
 | sub-031275_label_cer.nii.gz | 7           | L_Crus_II  | 1005           | 8040.000000         | 3930.752935                     | 0.989745     | 2.645862   | 0.493756  | 1.617023       | [23.8352, 34.2780, -49.6458]  | [14.6968, 23.7651, 62.8792] | [20, 29, 33, 42, 56, 42] |
 
-## Running on Niagara
-
-### Nextflow binary
-
-The Nextflow binary is required.  
-The following steps need to only be done once.
-
-- Download from [nextflow.io](https://www.nextflow.io/)
-
-```bash
-curl -s https://get.nextflow.io | bash
-```
-
-- The binary should be placed in `~/.local/bin`.
-
-```bash
-mv nextflow ~/.local/bin
-```
-
-- And the bin directory should be added to your path. And your `.bashrc` needs to be sourced.
-
-```bash
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-```
-
-```bash
-source ~/.bashrc
-```
-
-- ensure nextflow can run
-
-```bash
-nextflow help
-```
+## Running on Trillium
 
 ### Loading modules
 
-Now the correct modules need to be loaded.
-This needs to be done every time.
+The correct modules need to be loaded.
+This needs to be done every time. And can be included in a run script.
 
 > [!IMPORTANT]
 > Do not load modules from `.bashrc`.
 
 ```bash
 module load cobralab
-module load openjdk/17.0.9
 ```
 
-> [!NOTE]  
-> As of writing this (Spring 2025) openjdk/17.0.9 was the latest version on Niagara.
-> Nextflow needs Java Version 17 or later
-
-### Run command on Niagara
+### Run command on Trillium
 
 > [!IMPORTANT]
-> Nextflow requires the ssh session to remain active. This can be achieved by keeping the terminal used to ssh into Niagara open and running. 
-> A more convient approach is to use a tool that allows persistent server sessions like 
+> Nextflow requires the ssh session to remain active. This can be achieved by keeping the terminal used to ssh into Niagara open and running.
+> A more convient approach is to use a tool that allows persistent server sessions like
 > [Tmux](https://github.com/tmux/tmux/wiki) or [Screen](https://www.gnu.org/software/screen/manual/screen.html).
 
-To ensure submission to SLURM the the Niagara profile must be used.
-This is provided in `nextflow.config` file and can be passed using the `--profile` flag.
-Other useful flags to pass are `-bg` to run in background and `-resume` to resume processing if there was an interuption.
+To ensure submission to SLURM the Trillium profile must be used.
+The DRAC configs are mainted in the [nf-core config repo](https://nf-co.re/configs/alliance_canada/)
+The Trillium profile loaded automatically if the allaince_canada confg is used.
+The Trillium profile has been extended to be suitable for MAGeTBrain-nextflow.
 
 ```bash
-nextflow run -bg magetbrain.nf -profile niagara -resume
+nextflow run magetbrain.nf \
+    -profile alliance_canada,alliance_extended \
+    --inputDir inputs \
+    --outputDir output
 ```
 
+Other useful flags to pass are `-bg` to run in background and `-resume` to resume processing if there was an interuption.
+
 > [!IMPORTANT]
-> A bug when running on Niagara requires and additional script to be run to collect volumes.
+> A bug when running on HPC requires and additional script to be run to collect volumes.
 > This can be done on the login node without submitting job to SLURM
 
 ```bash
