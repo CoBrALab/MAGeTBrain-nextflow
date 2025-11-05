@@ -1,4 +1,3 @@
-nextflow.enable.dsl=2 
 include {validateInputDirectoryStructure} from "./validateInputDirectoryStructure.nf"
 include {collectVolumes} from "./collect_and_combine_volumes.nf"
 include {combineVolumes} from "./collect_and_combine_volumes.nf"
@@ -276,35 +275,47 @@ workflow collectAndCombineVolumes{
     }
 
 workflow {
+    log.info"""
+        ========================================
+               MAGeTBrain-nextflow
+        ========================================
+        Nextflow version: ${workflow.nextflow.version}
+        Config: ${params.config_profile_description}"""
+    
+    log.info "        ========================================"
 
-    log.info "Validating input directory structure..."
+    log.info "        Validating input directory structure..."
     validateInputDirectoryStructure()
 
-        def atlasesDir = file("${params.inputDir}/atlases")
-        def subjectsDir = file("${params.inputDir}/subjects")
-        def templatesDir = file("${params.inputDir}/templates")
+    def atlasesDir = file("${params.inputDir}/atlases")
+    def subjectsDir = file("${params.inputDir}/subjects")
+    def templatesDir = file("${params.inputDir}/templates")
 
-        def T1wPattern = "*${params.primarySpectra}.nii.gz"
-        def atlasLabelPattern = "*_label_*.nii.gz"
-        def atlasCsvPattern = "volume_labels_*.csv"
+    def T1wPattern = "*${params.primarySpectra}.nii.gz"
+    def atlasLabelPattern = "*_label_*.nii.gz"
+    def atlasCsvPattern = "volume_labels_*.csv"
 
-      def atlases = Channel
-             .fromPath("${atlasesDir}/${T1wPattern}") 
-                          .map { file -> tuple(file.simpleName.minus('_' + params.primarySpectra), file) }
-      def labels = Channel
-             .fromPath("${atlasesDir}/${atlasLabelPattern}")
-                          .map { file -> tuple(file.simpleName - ~/_label.*/, (file.simpleName =~ /_label.*/)[0], file) }
-      def templates = Channel
-             .fromPath("${templatesDir}/${T1wPattern}")
-                          .map { file -> tuple(file.simpleName.minus('_' + params.primarySpectra), file) }
-      def subjects = Channel
-             .fromPath("${subjectsDir}/${T1wPattern}")
-                          .map { file -> tuple(file.simpleName.minus('_' + params.primarySpectra), file) }
+    def atlases = Channel
+        .fromPath("${atlasesDir}/${T1wPattern}")
+        .map { file -> tuple(file.simpleName.minus('_' + params.primarySpectra), file) }
+
+    def labels = Channel
+        .fromPath("${atlasesDir}/${atlasLabelPattern}")
+        .map { file -> tuple(file.simpleName - ~/_label.*/, (file.simpleName =~ /_label.*/)[0], file) }
+
+    def templates = Channel
+        .fromPath("${templatesDir}/${T1wPattern}")
+        .map { file -> tuple(file.simpleName.minus('_' + params.primarySpectra), file) }
+
+    def subjects = Channel
+        .fromPath("${subjectsDir}/${T1wPattern}")
+        .map { file -> tuple(file.simpleName.minus('_' + params.primarySpectra), file) }
 
     log.info "Running MAGeTBrain..."
-    majorityVoteOutput= MAGeTBrain(atlases, labels, templates, subjects)
+    majorityVoteOutput = MAGeTBrain(atlases, labels, templates, subjects)
+
     collectAndCombineVolumes(majorityVoteOutput)
+
     log.info "MAGeTBrain finished."
-    
-    }
+}
 
