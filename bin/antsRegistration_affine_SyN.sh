@@ -1,1 +1,1 @@
-minc-toolkit-extras/antsRegistration_affine_SyN.sh
+antsRegistration_affine_SyN/antsRegistration_affine_SyN.sh
