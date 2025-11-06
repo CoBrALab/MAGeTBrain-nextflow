@@ -180,7 +180,7 @@ nextflow run magetbrain.nf \
 Other useful flags to pass are `-bg` to run in background and `-resume` to resume processing if there was an interuption.
 
 > [!IMPORTANT]
-> A bug when running on HPC requires and additional script to be run to collect volumes.
+> A bug when running on HPC requires an additional script to be run to collect volumes.
 > This can be done on the login node without submitting job to SLURM
 
 ```bash
