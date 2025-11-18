@@ -157,6 +157,11 @@ This needs to be done every time. And can be included in a run script.
 ```bash
 module load cobralab
 ```
+### Using a container
+To enable use of container the `standard` profile can be used. 
+```bash
+nextflow run magetbrain.nf -profile standard
+```
 
 ### Run command on Trillium
 
