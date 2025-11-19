@@ -144,6 +144,12 @@ The outputs for this function are as follows with some additional manipulation b
 | sub-031275_label_cer.nii.gz | 6           | L_Crus_I   | 1056           | 8448.000000         | 4040.455378                     | 0.980065     | 2.243498   | 0.496466  | 2.344949       | [31.6046, 27.4819, -41.2604]  | [11.2453, 26.3697, 59.1605] | [19, 30, 38, 42, 56, 46] |
 | sub-031275_label_cer.nii.gz | 7           | L_Crus_II  | 1005           | 8040.000000         | 3930.752935                     | 0.989745     | 2.645862   | 0.493756  | 1.617023       | [23.8352, 34.2780, -49.6458]  | [14.6968, 23.7651, 62.8792] | [20, 29, 33, 42, 56, 42] |
 
+## Using a container
+To enable use of container the `standard` profile can be used. 
+```bash
+nextflow run magetbrain.nf -profile standard
+```
+
 ## Running on Trillium
 
 ### Loading modules
@@ -156,11 +162,6 @@ This needs to be done every time. And can be included in a run script.
 
 ```bash
 module load cobralab
-```
-### Using a container
-To enable use of container the `standard` profile can be used. 
-```bash
-nextflow run magetbrain.nf -profile standard
 ```
 
 ### Run command on Trillium
