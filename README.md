@@ -1,4 +1,4 @@
-# MAGeTbrain Pipeline
+# MAGeTBrain Pipeline
 
 A Nextflow implementation of the [Multiple Automatically Generated Templates (MAGeT) brain](https://github.com/CobraLab/MAGeTbrain) segmentation pipeline.
 
@@ -51,7 +51,7 @@ These are not requirements if running on Niagara [see below](#Running-on-Niagara
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/CoBrALab/MAGeTBrain-nextflow.git
+git clone --recursive https://github.com/CoBrALab/MAGeTBrain-nextflow.git
 cd MAGeTBrain-nextflow
 ```
 
