@@ -167,7 +167,7 @@ This needs to be done every time. It can be included in a run script.
 > Do not load modules from `.bashrc`.
 
 ```bash
-module load nextflow
+module load nextflow ants
 ```
 A SLURM account needs to be assigned.
 ```bash
