@@ -152,43 +152,56 @@ nextflow run magetbrain.nf -profile standard
 
 ## Running on Trillium
 
-### Loading modules
-
-The correct modules need to be loaded.
-This needs to be done every time. And can be included in a run script.
-
-> [!IMPORTANT]
-> Do not load modules from `.bashrc`.
-
-```bash
-module load cobralab
-```
-
-### Run command on Trillium
-
 > [!IMPORTANT]
 > Nextflow requires the ssh session to remain active. This can be achieved by keeping the terminal used to ssh into Trillium open and running.
 > A more convient approach is to use a tool that allows persistent server sessions like
 > [Tmux](https://github.com/tmux/tmux/wiki) or [Screen](https://www.gnu.org/software/screen/manual/screen.html).
 
+
+### Loading modules and setting SLURM account
+
+The correct modules need to be loaded.
+
+This needs to be done every time. It can be included in a run script.
+
+> [!IMPORTANT]
+> Do not load modules from `.bashrc`.
+
+```bash
+module load nextflow
+```
+A SLURM account needs to be assigned.
+```bash
+export SLURM_ACCOUNT=def-youruser
+```
+
+### Run command on Trillium
+
 To ensure submission to SLURM the Trillium profile must be used.
-The DRAC configs are mainted in the [nf-core config repo](https://nf-co.re/configs/alliance_canada/)
 The Trillium profile loaded automatically if the allaince_canada confg is used.
-The Trillium profile has been extended to be suitable for MAGeTBrain-nextflow.
 
 ```bash
 nextflow run magetbrain.nf \
-    -profile alliance_canada,alliance_extended \
+    -profile alliance_canada \
     --inputDir inputs \
     --outputDir output
 ```
 
+This should show the text: `Config: Alliance Canada (Trillium) cluster profile provided by nf-core/configs.` when MAGeTBrain is started.
+
+
 Other useful flags to pass are `-bg` to run in background and `-resume` to resume processing if there was an interuption.
+
+
+More information about nextflow on DRAC can be found in the [Alliance docs](https://docs.alliancecan.ca/wiki/Nextflow).  
+The DRAC configs are mainted in the [nf-core config repo](https://nf-co.re/configs/alliance_canada/).  
+
 
 > [!IMPORTANT]
 > A bug when running on HPC requires an additional script to be run to collect volumes.
 > This can be done on the login node without submitting job to SLURM
 
 ```bash
-nextflow run collect_and_combine_volumes_niagara.nf
+nextflow run collect_and_combine_volumes_trillium.nf
 ```
+
