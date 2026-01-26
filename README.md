@@ -177,7 +177,7 @@ export SLURM_ACCOUNT=def-youruser
 ### Run command on Trillium
 
 To ensure submission to SLURM the Trillium profile must be used.
-The Trillium profile loaded automatically if the allaince_canada confg is used.
+The Trillium profile is loaded automatically if the alliance_canada config is used.  
 
 ```bash
 nextflow run magetbrain.nf \
