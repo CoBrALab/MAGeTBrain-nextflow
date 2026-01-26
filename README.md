@@ -189,11 +189,11 @@ nextflow run magetbrain.nf \
 This should show the text: `Config: Alliance Canada (Trillium) cluster profile provided by nf-core/configs.` when MAGeTBrain is started.
 
 
-Other useful flags to pass are `-bg` to run in background and `-resume` to resume processing if there was an interuption.
+Other useful flags to pass are `-bg` to run in background and `-resume` to resume processing if there was an interruption.
 
 
 More information about nextflow on DRAC can be found in the [Alliance docs](https://docs.alliancecan.ca/wiki/Nextflow).  
-The DRAC configs are mainted in the [nf-core config repo](https://nf-co.re/configs/alliance_canada/).  
+The DRAC configs are maintained in the [nf-core config repo](https://nf-co.re/configs/alliance_canada/).  
 
 
 > [!IMPORTANT]
