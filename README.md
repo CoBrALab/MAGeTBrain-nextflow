@@ -154,9 +154,8 @@ nextflow run magetbrain.nf -profile standard
 
 > [!IMPORTANT]
 > Nextflow requires the ssh session to remain active. This can be achieved by keeping the terminal used to ssh into Trillium open and running.
-> A more convient approach is to use a tool that allows persistent server sessions like
+> A more convenient approach is to use a tool that allows persistent server sessions like
 > [Tmux](https://github.com/tmux/tmux/wiki) or [Screen](https://www.gnu.org/software/screen/manual/screen.html).
-
 
 ### Loading modules and setting SLURM account
 
