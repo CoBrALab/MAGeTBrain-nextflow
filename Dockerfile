@@ -1,4 +1,4 @@
-FROM antsx/ants:v2.5.4
+FROM antsx/ants:v2.6.5
 
 RUN \
     --mount=type=cache,sharing=private,target=/var/cache/apt \
