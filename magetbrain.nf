@@ -145,7 +145,7 @@ process majorityVote {
   // memory '16GB'
   // time '30min'
 
-  publishDir "${params.outputDir}/labels/majorityvote", mode: "rellink"
+  publishDir "${params.outputDir}/labels/majorityvote", mode: "copy"
   input:
     tuple val(subjectId),
           val(labelExt),
@@ -250,7 +250,7 @@ workflow collectAndCombineVolumes{
   main:
     majorityVoteOutput
         .map { a_file ->
-            def matcher = a_file.name =~ /_label_([\w]+)\.nii.gz/
+            def matcher = a_file.name =~ /_label_([\w-]+)\.nii\.gz/
             if (matcher.find()) {
                 def label = matcher.group(1)
                 def csvFile = file("${params.inputDir}/atlases/volume_labels_${label}.csv")
@@ -262,12 +262,12 @@ workflow collectAndCombineVolumes{
 
                 }
             } else {
-                // if the file match does not exists null will be returned
-                // nextflow automatically handles nulls
                 return null  
             }
         }
+        .filter { it != null }
         .set { filesToProcess }
+
     // collect the volumes and combine results
     volumes = collectVolumes(filesToProcess)
     // after all files process they will be collected
@@ -316,6 +316,5 @@ workflow {
 
     collectAndCombineVolumes(majorityVoteOutput)
 
-    log.info "MAGeTBrain finished."
 }
 

@@ -63,10 +63,11 @@ cd MAGeTBrain-nextflow
 > [!IMPORTANT]  
 > A note about labels for use with `collect_volumes_nifti_sh`
 > Nextflow uses regex to match `volume_label_<label>.csv` to the corresponding majorityVote ouput
-> Specifically it matches on `\w`, that is any letter, digit or underscore. Equivalent to [a-zA-Z0-9_].
-> `/_label_([\w]+)\.nii.gz/`.
-> \_This means only alphanumerical characters can be used\_
-> other characters like `-  , . < >` etc. will cause errors
+> Specifically it matches on `[\w-]`, i.e. letters, digits, underscore, and hyphen. Equivalent to [a-zA-Z0-9_-].
+> `/_label_([\w-]+)\.nii\.gz/`.
+> \_This means labels may include alphanumerical characters, underscores, and hyphens only.\_
+> other characters like `, . < >` etc. will cause errors
+
 
 ```bash
 inputs
@@ -181,7 +182,7 @@ The Trillium profile is loaded automatically if the alliance_canada config is us
 
 ```bash
 nextflow run magetbrain.nf \
-    -profile alliance_canada \
+    -profile alliance_canada,trillium_extended \
     --inputDir inputs \
     --outputDir output
 ```
@@ -194,13 +195,3 @@ Other useful flags to pass are `-bg` to run in background and `-resume` to resum
 
 More information about nextflow on DRAC can be found in the [Alliance docs](https://docs.alliancecan.ca/wiki/Nextflow).  
 The DRAC configs are maintained in the [nf-core config repo](https://nf-co.re/configs/alliance_canada/).  
-
-
-> [!IMPORTANT]
-> A bug when running on HPC requires an additional script to be run to collect volumes.
-> This can be done on the login node without submitting job to SLURM
-
-```bash
-nextflow run collect_and_combine_volumes_trillium.nf
-```
-

@@ -2,7 +2,7 @@ nextflow.enable.dsl=2
 
 process collectVolumes {
   label 'collectVolumes'
-  cpus 4
+  cpus 1
   // memory '16GB'
   // time '30min'
 
@@ -28,7 +28,7 @@ process collectVolumes {
 
 process combineVolumes {
 
-  publishDir path:"${params.outputDir}/labels/majorityvote/collectedVolumes", mode: "rellink"
+  publishDir path:"${params.outputDir}/labels/majorityvote/collectedVolumes", mode: "copy"
 
   input:
     path files 
