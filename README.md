@@ -181,7 +181,7 @@ The Trillium profile is loaded automatically if the alliance_canada config is us
 
 ```bash
 nextflow run magetbrain.nf \
-    -profile alliance_canada \
+    -profile alliance_canada,trillium_extended \
     --inputDir inputs \
     --outputDir output
 ```
@@ -194,13 +194,3 @@ Other useful flags to pass are `-bg` to run in background and `-resume` to resum
 
 More information about nextflow on DRAC can be found in the [Alliance docs](https://docs.alliancecan.ca/wiki/Nextflow).  
 The DRAC configs are maintained in the [nf-core config repo](https://nf-co.re/configs/alliance_canada/).  
-
-
-> [!IMPORTANT]
-> A bug when running on HPC requires an additional script to be run to collect volumes.
-> This can be done on the login node without submitting job to SLURM
-
-```bash
-nextflow run collect_and_combine_volumes_trillium.nf
-```
-
