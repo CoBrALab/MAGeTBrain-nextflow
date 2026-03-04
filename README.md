@@ -63,10 +63,11 @@ cd MAGeTBrain-nextflow
 > [!IMPORTANT]  
 > A note about labels for use with `collect_volumes_nifti_sh`
 > Nextflow uses regex to match `volume_label_<label>.csv` to the corresponding majorityVote ouput
-> Specifically it matches on `\w`, that is any letter, digit or underscore. Equivalent to [a-zA-Z0-9_].
-> `/_label_([\w]+)\.nii.gz/`.
-> \_This means only alphanumerical characters can be used\_
-> other characters like `-  , . < >` etc. will cause errors
+> Specifically it matches on `[\w-]`, i.e. letters, digits, underscore, and hyphen. Equivalent to [a-zA-Z0-9_-].
+> `/_label_([\w-]+)\.nii\.gz/`.
+> \_This means labels may include alphanumerical characters, underscores, and hyphens only.\_
+> other characters like `, . < >` etc. will cause errors
+
 
 ```bash
 inputs
