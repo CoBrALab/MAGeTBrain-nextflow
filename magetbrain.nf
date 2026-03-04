@@ -145,7 +145,7 @@ process majorityVote {
   // memory '16GB'
   // time '30min'
 
-  publishDir "${params.outputDir}/labels/majorityvote", mode: "rellink"
+  publishDir "${params.outputDir}/labels/majorityvote", mode: "copy"
   input:
     tuple val(subjectId),
           val(labelExt),
@@ -316,6 +316,5 @@ workflow {
 
     collectAndCombineVolumes(majorityVoteOutput)
 
-    log.info "MAGeTBrain finished."
 }
 
