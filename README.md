@@ -189,6 +189,10 @@ nextflow run magetbrain.nf \
 
 This should show the text: `Config: Alliance Canada (Trillium) cluster profile provided by nf-core/configs.` when MAGeTBrain is started.
 
+> [!NOTE]
+> The `alliance_canada` profile is fetched from [nf-core/configs](https://nf-co.re/configs/alliance_canada/) at startup, so the login node needs outbound network access.
+> If it does not have any, set `export NXF_OFFLINE=1` to skip the fetch — note that `-profile alliance_canada` is then unavailable.
+
 
 Other useful flags to pass are `-bg` to run in background and `-resume` to resume processing if there was an interruption.
 
